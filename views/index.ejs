@@ -33,19 +33,20 @@
       <h1>Wally's Weather API</h1>
       <h2>Weather API</h2>
       <p>To retrieve weather information, send a <strong>POST</strong> request to the following endpoint:</p>
-      <code>{{currentUrl}}/weather</code>
+      <code>https://weather-api-production-c823.up.railway.app/api/weather</code>
       <p>The request body should include the following parameters:</p>
       <ul>
         <li><strong>location</strong>: The location for which you want to retrieve weather information.</li>
         <li><strong>extended</strong>: Set to <strong>hourly</strong>, <strong>daily</strong>, or <strong>weekly</strong> for different forecast intervals.</li>
+        <li><strong>celsius</strong>: Boolean parameter to determine whether results should be metric or not.</li>
       </ul>
 
       <h2>Giphy API</h2>
       <p>To retrieve a GIF based on weather conditions, send a <strong>POST</strong> request to the following endpoint:</p>
-      <code>{{currentUrl}}/giphy</code>
+      <code>https://weather-api-production-c823.up.railway.app/api/giphy</code>
       <p>The request body should include the following parameter:</p>
       <ul>
-        <li><strong>weather</strong>: The weather condition for which you want to retrieve a GIF.</li>
+        <li><strong>query</strong>: The weather condition for which you want to retrieve a GIF.</li>
       </ul>
     </div>
   </body>
