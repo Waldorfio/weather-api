@@ -45,7 +45,7 @@ router.post('/weather', async (req, res, next) => {
     const errorCode = error?.code || 'UNKNOWN_ERROR';
     const errorMessage = error?.message || 'An unknown error occurred.';
     const status = error?.response ? error?.response?.status : 500;
-    const statusText = error?.response ? error?.response?.statusText : 'Internal Server Error';
+    const statusText = error?.response.data ? error?.response.data.Message : 'Internal Server Error';
     res.status(status).send({
         error: {
           code: errorCode,
