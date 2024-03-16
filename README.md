@@ -1,7 +1,9 @@
-# Weather App API
+# Weather App Backend
 
-The API component of the weather app
+The Backend component of the weather app
 [Live Link](https://weather-api-production-c823.up.railway.app)
+
+Written with NodeJS and ExpressJS
 
 Refer to the main front-end [README.md](https://github.com/Waldorfio/weather-frontend#readme) for information on challenges/improvements.
 
