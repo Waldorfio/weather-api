@@ -10,56 +10,75 @@ const WEATHER_KEY = process.env.WEATHER_KEY; // Import weather api key from .env
 const GIPHY_KEY = process.env.GIPHY_API_KEY; // Import giphy api key from .env file
 
 async function getLocationKey(city, extended) {
-    console.log('flag 1')
     const response = await axios.get(
         `http://dataservice.accuweather.com/locations/v1/cities/search?apikey=${WEATHER_KEY}&q=${encodeURIComponent(city)}`
     );
     const data = response.data;
 
     if (data && data.length > 0) {
-        return data[0].Key;
+        return { key: data[0].Key, cityReturned: data[0].EnglishName, country: data[0].Country.EnglishName };
     } else {
         return null;
     }
 }
 
-//! Accuweather API Route
+//! Weather API Route
 router.post('/weather', async (req, res, next) => {
-    console.log('flag 2')
   try {
-    const { city, extended } = req.body;
-    const locationKey = await getLocationKey(city, extended); // Fetch Location Key, based on input location
-
+    const { city, extended, celsius } = req.body;
+    const { key, cityReturned, country } = await getLocationKey(city, extended); // Fetch Location Key, based on input location
     let accuweatherResponse
-    if (extended) {
+    if (extended.length > 0) {
     // Fetch extended forecast
         accuweatherResponse = await axios.get(
-            `http://dataservice.accuweather.com/forecasts/v1/${extended}/1day/${locationKey}?apikey=${WEATHER_KEY}`
+            `http://dataservice.accuweather.com/forecasts/v1/${extended}/5day/${key}?apikey=${WEATHER_KEY}&metric=${celsius}&details=true`
         );
     } else {
     // Fetch current weather
         accuweatherResponse = await axios.get(
-            `http://dataservice.accuweather.com/currentconditions/v1/${locationKey}?apikey=${WEATHER_KEY}`
+            `http://dataservice.accuweather.com/currentconditions/v1/${key}?apikey=${WEATHER_KEY}&details=true`
         );
     }
-    const weatherData = accuweatherResponse.data;
-    res.json({ weather: weatherData });
+    const weatherData = extended.length > 0 ? accuweatherResponse.data : accuweatherResponse.data[0];
+    res.json({ weather: weatherData, city: cityReturned, country: country });
   } catch (error) {
-    console.error('Error returning weather data')
-    res.status(500).send('Error returning weather data', error);
+    const errorCode = error?.code || 'UNKNOWN_ERROR';
+    const errorMessage = error?.message || 'An unknown error occurred.';
+    const status = error?.response ? error?.response?.status : 500;
+    const statusText = error?.response ? error?.response?.statusText : 'Internal Server Error';
+    res.status(status).send({
+        error: {
+          code: errorCode,
+          message: errorMessage,
+          status: status,
+          statusText: statusText
+        }
+    });
   }
 });
 
 //! GIPHY API Route
-router.get('/giphy', async (req, res, next) => {
+router.post('/giphy', async (req, res, next) => {
   try {
-    // Make request to GIPHY API
-    const giphyResponse = await axios.get('YOUR_GIPHY_API_ENDPOINT');
+    const { query } = req.body;
+    const giphyResponse = await axios.get(
+      `http://api.giphy.com/v1/gifs/search?q=${query}&api_key=${GIPHY_KEY}&limit=1`
+      );
     const giphyData = giphyResponse.data; // Assuming GIPHY response contains necessary GIF data
     res.json({ gif: giphyData });
   } catch (error) {
-    console.error('Error returning GIPHY')
-    res.status(500).send('Error returning GIPHY', error);
+    const errorCode = error?.code || 'UNKNOWN_ERROR';
+    const errorMessage = error?.message || 'An unknown error occurred.';
+    const status = error?.response ? error?.response?.status : 500;
+    const statusText = error?.response ? error?.response?.statusText : 'Internal Server Error';
+    res.status(status).send({
+        error: {
+          code: errorCode,
+          message: errorMessage,
+          status: status,
+          statusText: statusText
+        }
+    });
   }
 });
 
